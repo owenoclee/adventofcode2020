@@ -31,26 +31,6 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	entries := parseLinesToEntries(lines)
-	var validCount int
-	for _, e := range entries {
-		if validator(e) {
-			validCount++
-		}
-	}
-	fmt.Println(validCount)
-}
-
-func partOneValidator(e entry) bool {
-	occurrences := strings.Count(e.password, string(e.letter))
-	return occurrences >= e.min && occurrences <= e.max
-}
-
-func partTwoValidator(e entry) bool {
-	return (e.password[e.min-1] == e.letter) != (e.password[e.max-1] == e.letter)
-}
-
-func parseLinesToEntries(lines []string) []entry {
 	var entries []entry
 	for i, line := range lines {
 		parts := strings.Split(line, " ")
@@ -79,7 +59,23 @@ func parseLinesToEntries(lines []string) []entry {
 			password: password,
 		})
 	}
-	return entries
+
+	var validCount int
+	for _, e := range entries {
+		if validator(e) {
+			validCount++
+		}
+	}
+	fmt.Println(validCount)
+}
+
+func partOneValidator(e entry) bool {
+	occurrences := strings.Count(e.password, string(e.letter))
+	return occurrences >= e.min && occurrences <= e.max
+}
+
+func partTwoValidator(e entry) bool {
+	return (e.password[e.min-1] == e.letter) != (e.password[e.max-1] == e.letter)
 }
 
 func lineMalformedError(lineNumber int) error {

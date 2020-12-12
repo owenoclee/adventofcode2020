@@ -2,13 +2,13 @@
 package main
 
 import (
-	"bufio"
 	"errors"
 	"flag"
 	"fmt"
 	"math"
 	"os"
-	"strconv"
+
+	"github.com/owenoclee/adventofcode2020/parse"
 )
 
 const goal = 2020
@@ -17,16 +17,12 @@ func main() {
 	summandsCount := flag.Int("s", 2, "Specify how many summands to use")
 	flag.Parse()
 
-	var expenseReport []int
-	scanner := bufio.NewScanner(os.Stdin)
-	for scanner.Scan() {
-		num, err := strconv.Atoi(scanner.Text())
-		if err != nil {
-			panic(err)
-		}
-		expenseReport = append(expenseReport, num)
+	lines, err := parse.LinesFrom(os.Stdin)
+	if err != nil {
+		panic(err)
 	}
-	if err := scanner.Err(); err != nil {
+	expenseReport, err := parse.LinesToInts(lines)
+	if err != nil {
 		panic(err)
 	}
 
