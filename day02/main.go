@@ -1,6 +1,8 @@
+// Example usage: cat input.txt | go run . -p 1
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	"strconv"
@@ -16,12 +18,15 @@ type entry struct {
 	password string
 }
 
-func (e entry) valid() bool {
-	occurrences := strings.Count(e.password, string(e.letter))
-	return occurrences >= e.min && occurrences <= e.max
-}
-
 func main() {
+	part := flag.Int("p", 1, "Specify which part of the puzzle to solve")
+	flag.Parse()
+
+	validator := partOneValidator
+	if *part == 2 {
+		validator = partTwoValidator
+	}
+
 	lines, err := parse.LinesFrom(os.Stdin)
 	if err != nil {
 		panic(err)
@@ -29,11 +34,20 @@ func main() {
 	entries := parseLinesToEntries(lines)
 	var validCount int
 	for _, e := range entries {
-		if e.valid() {
+		if validator(e) {
 			validCount++
 		}
 	}
 	fmt.Println(validCount)
+}
+
+func partOneValidator(e entry) bool {
+	occurrences := strings.Count(e.password, string(e.letter))
+	return occurrences >= e.min && occurrences <= e.max
+}
+
+func partTwoValidator(e entry) bool {
+	return (e.password[e.min-1] == e.letter) != (e.password[e.max-1] == e.letter)
 }
 
 func parseLinesToEntries(lines []string) []entry {
