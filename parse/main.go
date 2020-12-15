@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"io"
 	"strconv"
+	"strings"
 )
 
 func LinesFrom(r io.Reader) ([]string, error) {
@@ -13,6 +14,14 @@ func LinesFrom(r io.Reader) ([]string, error) {
 		lines = append(lines, scanner.Text())
 	}
 	return lines, scanner.Err()
+}
+
+func TextFrom(r io.Reader) (string, error) {
+	lines, err := LinesFrom(r)
+	if err != nil {
+		return "", err
+	}
+	return strings.Join(lines, "\n"), nil
 }
 
 func LinesToInts(lines []string) ([]int, error) {
