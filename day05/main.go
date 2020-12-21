@@ -1,8 +1,11 @@
+// Example usage: cat input.txt | go run . -p 1
 package main
 
 import (
 	"errors"
+	"flag"
 	"fmt"
+	"math"
 	"os"
 	"regexp"
 	"strconv"
@@ -12,22 +15,43 @@ import (
 )
 
 func main() {
+	part := flag.Int("p", 1, "Specify which part of the puzzle to solve")
+	flag.Parse()
+
 	lines, err := parse.LinesFrom(os.Stdin)
 	if err != nil {
 		panic(err)
 	}
 
-	highestSeatID := 0
+	seatIDs := make(map[int]struct{})
 	for i, l := range lines {
 		row, col, err := decodeSeat(l)
 		if err != nil {
 			panic(invalidSeatError(i+1, l))
 		}
-		if id := seatID(row, col); id > highestSeatID {
+		seatIDs[seatID(row, col)] = struct{}{}
+	}
+
+	lowestSeatID := math.MaxInt32
+	highestSeatID := 0
+	for id := range seatIDs {
+		if id > highestSeatID {
 			highestSeatID = id
+		} else if id < lowestSeatID {
+			lowestSeatID = id
 		}
 	}
-	fmt.Println(highestSeatID)
+	if *part != 2 {
+		fmt.Println(highestSeatID)
+		return
+	}
+
+	for i := lowestSeatID; i < highestSeatID; i++ {
+		if _, ok := seatIDs[i]; !ok {
+			fmt.Println(i)
+			return
+		}
+	}
 }
 
 var seatRegexp = regexp.MustCompile(`[FB]{7}[RL]{3}`)
