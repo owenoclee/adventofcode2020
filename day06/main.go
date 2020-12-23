@@ -1,3 +1,4 @@
+// Example usage: cat input.txt | go run . -p 1
 package main
 
 import (
