@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	"regexp"
@@ -21,6 +22,9 @@ var ruleRegexp = regexp.MustCompile(`^(\w+ \w+) bags contain (.*)\.$`)
 var contentRegexp = regexp.MustCompile(`(\d) (\w+ \w+) bags?`)
 
 func main() {
+	part := flag.Int("p", 1, "Specify which part of the puzzle to solve")
+	flag.Parse()
+
 	lines, err := parse.LinesFrom(os.Stdin)
 	if err != nil {
 		panic(err)
@@ -55,14 +59,18 @@ func main() {
 		mBag.contents = contents
 	}
 
-	total := 0
 	shinyGold := bags.get("shiny gold")
-	for _, b := range bags {
-		if b.canContain(shinyGold) {
-			total++
+	if *part != 2 {
+		total := 0
+		for _, b := range bags {
+			if b.canContain(shinyGold) {
+				total++
+			}
 		}
+		fmt.Println(total)
+		return
 	}
-	fmt.Println(total)
+	fmt.Println(shinyGold.containedBagsCount())
 }
 
 func (s bagSet) get(bagName string) *bag {
@@ -84,4 +92,15 @@ func (b *bag) canContain(desiredBag *bag) bool {
 		}
 	}
 	return false
+}
+
+func (b *bag) containedBagsCount() int {
+	if len(b.contents) == 0 {
+		return 0
+	}
+	containedCount := 0
+	for cb, quantity := range b.contents {
+		containedCount += (1 + cb.containedBagsCount()) * quantity
+	}
+	return containedCount
 }
