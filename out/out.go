@@ -5,6 +5,10 @@ import (
 	"os"
 )
 
+func Println(a ...interface{}) {
+	fmt.Println(a...)
+}
+
 func Fatalln(a ...interface{}) {
 	fmt.Println(a...)
 	os.Exit(0)
