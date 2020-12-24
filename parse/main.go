@@ -24,6 +24,14 @@ func TextFrom(r io.Reader) (string, error) {
 	return strings.Join(lines, "\n"), nil
 }
 
+func IntsFrom(r io.Reader) ([]int, error) {
+	lines, err := LinesFrom(r)
+	if err != nil {
+		return nil, err
+	}
+	return LinesToInts(lines)
+}
+
 func LinesToInts(lines []string) ([]int, error) {
 	var ints []int
 	for _, l := range lines {

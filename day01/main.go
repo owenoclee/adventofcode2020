@@ -17,11 +17,7 @@ func main() {
 	summandsCount := flag.Int("s", 2, "Specify how many summands to use")
 	flag.Parse()
 
-	lines, err := parse.LinesFrom(os.Stdin)
-	if err != nil {
-		panic(err)
-	}
-	expenseReport, err := parse.LinesToInts(lines)
+	expenseReport, err := parse.IntsFrom(os.Stdin)
 	if err != nil {
 		panic(err)
 	}
