@@ -2,9 +2,9 @@ package compass
 
 var (
 	North = Vector{0, 1}
-	East  = Vector{1, 0}
-	South = Vector{0, -1}
-	West  = Vector{-1, 0}
+	East  = North.Rotate(90)
+	South = North.Rotate(180)
+	West  = North.Rotate(270)
 
 	Zero = Vector{0, 0}
 )
@@ -18,24 +18,20 @@ func (v Vector) Add(v2 Vector) Vector {
 	return Vector{v.X + v2.X, v.Y + v2.Y}
 }
 
-func (v Vector) Multiply(mul int) Vector {
+func (v Vector) Scale(mul int) Vector {
 	return Vector{v.X * mul, v.Y * mul}
 }
 
-func (v Vector) Turn(angle int) Vector {
-	if mod(angle, 90) != 0 {
-		return v
+func (v Vector) Rotate(angle int) Vector {
+	switch mod(angle, 360) {
+	case 90:
+		return Vector{v.Y, -v.X}
+	case 180:
+		return Vector{-v.X, -v.Y}
+	case 270:
+		return Vector{-v.Y, v.X}
 	}
-	dir := angle / 90
-	var directions [4]Vector = [4]Vector{North, East, South, West}
-	var directionLookup = map[Vector]int{
-		directions[0]: 0,
-		directions[1]: 1,
-		directions[2]: 2,
-		directions[3]: 3,
-	}
-	curDirectionIdx := directionLookup[v]
-	return directions[mod(curDirectionIdx+dir, 4)]
+	return v
 }
 
 func (v Vector) ManhattanDistance() int {

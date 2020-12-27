@@ -1,6 +1,8 @@
 package main
 
 import (
+	"flag"
+	"fmt"
 	"os"
 	"strconv"
 
@@ -10,12 +12,18 @@ import (
 )
 
 func main() {
+	part := flag.Int("p", 1, "Specify which part of the puzzle to solve")
+	flag.Parse()
+
 	lines, err := parse.LinesFrom(os.Stdin)
 	if err != nil {
 		out.Fatalf("error parsing lines: %v", err)
 	}
 
-	direction := compass.East
+	waypoint := compass.East.Scale(10).Add(compass.North)
+	if *part != 2 {
+		waypoint = compass.East
+	}
 	location := compass.Zero
 	for i, l := range lines {
 		if len(l) < 2 {
@@ -27,22 +35,28 @@ func main() {
 		if err != nil {
 			out.Fatalf("argument is not a number on line %d", i)
 		}
+		var motion compass.Vector
 		switch action {
 		case 'N':
-			location = location.Add(compass.North.Multiply(arg))
+			motion = compass.North.Scale(arg)
 		case 'E':
-			location = location.Add(compass.East.Multiply(arg))
+			motion = compass.East.Scale(arg)
 		case 'S':
-			location = location.Add(compass.South.Multiply(arg))
+			motion = compass.South.Scale(arg)
 		case 'W':
-			location = location.Add(compass.West.Multiply(arg))
+			motion = compass.West.Scale(arg)
 		case 'F':
-			location = location.Add(direction.Multiply(arg))
+			location = location.Add(waypoint.Scale(arg))
 		case 'R':
-			direction = direction.Turn(arg)
+			waypoint = waypoint.Rotate(arg)
 		case 'L':
-			direction = direction.Turn(-arg)
+			waypoint = waypoint.Rotate(-arg)
 		}
+		if *part != 2 {
+			location = location.Add(motion)
+			continue
+		}
+		waypoint = waypoint.Add(motion)
 	}
 	out.Fatalln(location.ManhattanDistance())
 }
